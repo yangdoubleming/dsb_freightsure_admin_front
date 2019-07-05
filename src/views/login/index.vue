@@ -1,7 +1,7 @@
 <template>
     <div class="login-container">
         <el-form class="login-form" autoComplete="on" :model="loginForm" :rules="loginRules" ref="loginForm" label-position="left">
-            <h3 class="title">dowsure</h3>
+            <h3 class="title">欢迎登陆</h3>
             <el-form-item prop="username">
                 <span class="fontcontainer">
                     <span class="iconfont icon-yonghu"></span>

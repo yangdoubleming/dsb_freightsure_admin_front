@@ -28,12 +28,12 @@ export default {
     routes() {
       // return this.menus.data.menuList
         return  [{
-			title: "用户管理",
+			title: "信息管理",
 			list: [{
-				name: "用户信息",
+				name: "订单列表",
 				url: "userInfo"
 			},{
-				name: "贷款信息",
+				name: "理赔列表",
 				url: "loanRecords"
 			}],
 			class: "userManage"

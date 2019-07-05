@@ -1,44 +1,27 @@
 <template>
     <section>
-        <el-page-header @back="goBack" content="贷款记录">
         </el-page-header>
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:50px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="贷款期限" prop="loanTerm">
-                    <el-select v-model="ruleForm.loanTerm" placeholder="贷款期限">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="1个月" value="1"></el-option>
-                        <el-option label="2个月" value="2"></el-option>
-                        <el-option label="3个月" value="3"></el-option>
-                        <el-option label="4个月" value="4"></el-option>
-                        <el-option label="5个月" value="5"></el-option>
-                        <el-option label="6个月" value="6"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="贷款状态" prop="status">
-                    <el-select v-model="ruleForm.status" placeholder="状态">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="资料未完成" value="0"></el-option>
-                        <el-option label="审核中" value="1"></el-option>
-                        <el-option label="已终止" value="2"></el-option>
-                        <el-option label="放款中" value="3"></el-option>
-                        <el-option label="未结清" value="4"></el-option>
-                        <el-option label="已逾期" value="5"></el-option>
-                        <el-option label="已结清" value="6"></el-option>
-                        <el-option label="还款中" value="7"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="商户标识" prop="source" v-if='!this.$route.query.ciCompanyId'>
+                <el-form-item label="豆沙包订单号" prop="source" v-if='!this.$route.query.ciCompanyId'>
                     <el-input v-model="ruleForm.source" placeholder="请输入商户标识"></el-input>
                 </el-form-item>
-                <el-form-item label="结算状态" prop="settlement">
-                    <el-select v-model="ruleForm.settlement" placeholder="请选择结算状态">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="已结算" value="4"></el-option>
-                        <el-option label="已驳回" value="5"></el-option>
-                        <el-option label="已审核" value="3"></el-option>
-                    </el-select>
+                <el-form-item label="保司单号" prop="source" v-if='!this.$route.query.ciCompanyId'>
+                    <el-input v-model="ruleForm.source" placeholder="请输入商户标识"></el-input>
+                </el-form-item>
+                <el-form-item label="订单时间" prop="time">
+                    <el-date-picker
+                        v-model="ruleForm.time"
+                        type="daterange"
+                        range-separator="至"
+                        value-format="yyyy-MM-dd"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="商户名称" prop="source" v-if='!this.$route.query.ciCompanyId'>
+                    <el-input v-model="ruleForm.source" placeholder="请输入商户名称"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
@@ -51,16 +34,12 @@
 
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
-            <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column prop="loanTerm" label="贷款期限（月）" width="150"> </el-table-column>
-            <el-table-column prop="loanAmount" label="贷款金额（元）" width="280"> </el-table-column>
-            <el-table-column prop="applyTime" label="申请时间" width=""></el-table-column>
-            <el-table-column prop="status" label="贷款状态" width="" :formatter="statusText"> </el-table-column>
-            <el-table-column prop="contactName" label="联系人" width=""> </el-table-column>
-            <el-table-column prop="policyNo" label="电子保单号" width=""> </el-table-column>
-            <el-table-column prop="monthRepaymentDay" label="每月还款日期" width=""></el-table-column>
-            <el-table-column prop="notSettlementMoney" label="待结算金额（元）" width=""></el-table-column>
-            <el-table-column prop="settlement" label="结算状态" width="" :formatter="settlementText"></el-table-column>
+            <el-table-column prop="loanTerm" label="豆沙包订单号" width="150"> </el-table-column>
+            <el-table-column prop="loanAmount" label="保司保单号" width="280"> </el-table-column>
+            <el-table-column prop="applyTime" label="商户名称" width=""></el-table-column>
+            <el-table-column prop="status" label="理赔金额（元）" width="" :formatter="statusText"> </el-table-column>
+            <el-table-column prop="contactName" label="订单时间" width=""> </el-table-column>
+            <el-table-column prop="policyNo" label="处理时间" width=""> </el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="250">
                 <template slot-scope="scope">
                     <el-button
@@ -68,23 +47,6 @@
                         type="text"
                         size="small">
                         详情
-                    </el-button>
-                    <el-button
-                        @click="repayRecords(scope.row)"
-                        type="text"
-                        size="small">还款记录
-                    </el-button>
-                    <el-button
-                        @click="loanAudit(scope.row)"
-                        type="text"
-                        size="small">
-                        结算审核
-                    </el-button>
-                    <el-button
-                        @click="loanDetails(scope.row,'loanEdit')"
-                        type="text"
-                        size="small">
-                        编辑
                     </el-button>
                 </template>
             </el-table-column>
@@ -147,7 +109,7 @@
                 centerDialogVisible: false,
                 tableData: [],
                 total:0,
-                listLoading:true,
+                listLoading:false,
                 ruleForm: {
                     ciCompanyId:'',
                     loanTerm: "",
@@ -187,7 +149,6 @@
             ])
         },
         created() {
-            this.fetchData()
             this.ruleForm.ciCompanyId = this.$route.query.ciCompanyId ||''
         },
         methods: {

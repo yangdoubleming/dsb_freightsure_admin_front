@@ -3,21 +3,26 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="企业名称" prop="companyName">
-                    <el-input v-model="ruleForm.companyName" placeholder="请输入企业名称"></el-input>
+                <el-form-item label="豆沙包订单号" prop="companyName">
+                    <el-input v-model="ruleForm.companyName" placeholder="请输入豆沙包订单号"></el-input>
                 </el-form-item>
-                <el-form-item label="企业类型" prop="companyType">
-                    <el-select v-model="ruleForm.companyType" placeholder="状态">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="进口" value="1"></el-option>
-                        <el-option label="出口" value="2"></el-option>
-                        <el-option label="进口/出口" value="3"></el-option>
-                    </el-select>
+                <el-form-item label="保司单号" prop="companyName">
+                    <el-input v-model="ruleForm.companyName" placeholder="请输入保司单号"></el-input>
                 </el-form-item>
-                <el-form-item label="商户标识" prop="source">
-                    <el-input v-model="ruleForm.source" placeholder="请输入商户标识"></el-input>
+                <el-form-item label="订单时间" prop="time">
+                    <el-date-picker
+                        v-model="ruleForm.time"
+                        type="daterange"
+                        range-separator="至"
+                        value-format="yyyy-MM-dd"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
+                    </el-date-picker>
                 </el-form-item>
-                <el-form-item label="法人资产" prop="legalPersonsAssets">
+                <el-form-item label="商户名称" prop="source">
+                    <el-input v-model="ruleForm.source" placeholder="请输入商户名称"></el-input>
+                </el-form-item>
+                <el-form-item label="状态" prop="legalPersonsAssets">
                     <el-select v-model="ruleForm.legalPersonsAssets" placeholder="请选择法人资产">
                         <el-option label="全部" value=""></el-option>
                         <el-option label="500万以内" value="1"></el-option>
@@ -29,18 +34,20 @@
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
                     <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
+                    <!-- <el-button type="primary" @click="submitForm('ruleForm')">多单号查询</el-button> -->
+                    <el-button type="primary" @click="submitForm('ruleForm')">导出excel</el-button>
                 </el-form-item>
             </el-form>
 		</el-col>
 
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="加载中" style="width: 100%">
-            <el-table-column prop="contactPhone" label="用户账号" width="150"> </el-table-column>
-            <el-table-column prop="companyName" label="企业名称" width="280"> </el-table-column>
-            <el-table-column prop="companyType" label="企业类型"  :formatter="comTypeText" width=""></el-table-column>
-            <el-table-column prop="logisticsCompany" label="合作物流公司" width=""> </el-table-column>
-            <el-table-column prop="paymentCompany" label="合作支付公司" width=""> </el-table-column>
-            <el-table-column prop="legalPersonsAssets" label="法人资产情况" :formatter="statusText" width=""></el-table-column>
+            <el-table-column prop="contactPhone" label="豆沙包订单号" width="150"> </el-table-column>
+            <el-table-column prop="companyName" label="保司保单号" width="280"> </el-table-column>
+            <el-table-column prop="companyType" label="商户名称"  :formatter="comTypeText" width=""></el-table-column>
+            <el-table-column prop="logisticsCompany" label="订单时间" width=""> </el-table-column>
+            <el-table-column prop="paymentCompany" label="处理时间" width=""> </el-table-column>
+            <el-table-column prop="legalPersonsAssets" label="支付金额（元）" :formatter="statusText" width=""></el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="">
                 <template slot-scope="scope">
                     <el-button
@@ -87,7 +94,7 @@
             return {
                 tableData: [],
                 total:0,
-                listLoading:true,
+                listLoading:false,
                 ruleForm: {
                     companyName: "",
                     companyType: "",
@@ -113,7 +120,7 @@
             ])
         },
         created() {
-            this.fetchData()
+            // this.fetchData()
         },
         methods: {
             fetchData() {
