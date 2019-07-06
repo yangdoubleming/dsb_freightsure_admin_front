@@ -2,7 +2,15 @@ import request from '@/utils/request'
 
 export function getList(params) {
     return request({
-        url: '/findCiCompanyList',
+        url: '/order/ordersByBaosi',
+        method: 'post',
+        data: params
+    })
+}
+
+export function getCompanyListName(params) {
+    return request({
+        url: '/company/getCompanyListName',
         method: 'post',
         data: params
     })
@@ -10,7 +18,7 @@ export function getList(params) {
 
 export function getCusInsureDetails(params) {
     return request({
-        url: '/getCiCompanyAndPlatformById',
+        url: '/merchant/merchantOrderList',
         method: 'get',
         params: params
     })

@@ -13,9 +13,9 @@
             Home
           </el-dropdown-item>
         </router-link> -->
-        <!-- <el-dropdown-item divided>
+        <el-dropdown-item divided>
           <span @click="logout" style="display:block;">安全退出</span>
-        </el-dropdown-item> -->
+        </el-dropdown-item>
       </el-dropdown-menu>
     </el-dropdown>
   </el-menu>
@@ -42,9 +42,10 @@ export default {
       this.$store.dispatch('ToggleSideBar')
     },
     logout() {
-      this.$store.dispatch('LogOut').then(() => {
-        location.reload() // 为了重新实例化vue-router对象 避免bug
-      })
+      // this.$store.dispatch('LogOut').then(() => {
+      //   location.reload() // 为了重新实例化vue-router对象 避免bug
+      // })
+      this.$router.push({path:'/login'})
     }
   }
 }

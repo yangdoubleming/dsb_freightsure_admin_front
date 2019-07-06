@@ -3,15 +3,15 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="豆沙包订单号" prop="companyName">
-                    <el-input v-model="ruleForm.companyName" placeholder="请输入豆沙包订单号"></el-input>
+                <el-form-item label="豆沙包订单号" prop="ticketNo">
+                    <el-input v-model="ruleForm.ticketNo" placeholder="请输入豆沙包订单号"></el-input>
                 </el-form-item>
-                <el-form-item label="保司单号" prop="companyName">
-                    <el-input v-model="ruleForm.companyName" placeholder="请输入保司单号"></el-input>
+                <el-form-item label="保司单号" prop="polNo">
+                    <el-input v-model="ruleForm.polNo" placeholder="请输入保司单号"></el-input>
                 </el-form-item>
-                <el-form-item label="订单时间" prop="time">
+                <el-form-item label="生效时间" prop="time">
                     <el-date-picker
-                        v-model="ruleForm.time"
+                        v-model="today"
                         type="daterange"
                         range-separator="至"
                         value-format="yyyy-MM-dd"
@@ -19,16 +19,14 @@
                         end-placeholder="结束日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="商户名称" prop="source">
-                    <el-input v-model="ruleForm.source" placeholder="请输入商户名称"></el-input>
-                </el-form-item>
-                <el-form-item label="状态" prop="legalPersonsAssets">
-                    <el-select v-model="ruleForm.legalPersonsAssets" placeholder="请选择法人资产">
-                        <el-option label="全部" value=""></el-option>
-                        <el-option label="500万以内" value="1"></el-option>
-                        <el-option label="500万-1000万" value="2"></el-option>
-                        <el-option label="1000万-2000万" value="3"></el-option>
-                        <el-option label="2000万以上" value="4"></el-option>
+                <el-form-item label="商户名称" prop="companyName">
+                    <el-select v-model="ruleForm.companyName" filterable placeholder="请输入商户名称" @change="setSource">
+                        <el-option
+                        v-for="item in options"
+                        :key="item.source"
+                        :label="item.companyName"
+                        :value="item.companyName">
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -39,22 +37,18 @@
                 </el-form-item>
             </el-form>
 		</el-col>
+        <el-col :span="6" :offset="18" style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总支付金额：{{tableData.length>0&&tableData[0].paymoney/100||0}}</el-col>
 
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="加载中" style="width: 100%">
-            <el-table-column prop="contactPhone" label="豆沙包订单号" width="150"> </el-table-column>
-            <el-table-column prop="companyName" label="保司保单号" width="280"> </el-table-column>
-            <el-table-column prop="companyType" label="商户名称"  :formatter="comTypeText" width=""></el-table-column>
-            <el-table-column prop="logisticsCompany" label="订单时间" width=""> </el-table-column>
-            <el-table-column prop="paymentCompany" label="处理时间" width=""> </el-table-column>
-            <el-table-column prop="legalPersonsAssets" label="支付金额（元）" :formatter="statusText" width=""></el-table-column>
+            <el-table-column prop="ticketNo" label="豆沙包订单号" width="150"> </el-table-column>
+            <el-table-column prop="polNo" label="保司保单号" width="280"> </el-table-column>
+            <el-table-column prop="companyName" label="商户名称"   width=""></el-table-column>
+            <el-table-column prop="effectiveDate" label="生效时间" :formatter="dateFormat" width=""> </el-table-column>
+            <el-table-column prop="" label="订单状态" width="">已生效</el-table-column>
+            <el-table-column prop="prodAmount" label="支付金额（元）"  width=""></el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="">
                 <template slot-scope="scope">
-                    <el-button
-                        @click="loanRecords(scope.row)"
-                        type="text"
-                        size="small">贷款信息
-                    </el-button>
                     <el-button
                         @click="userInfoDetails(scope.row)"
                         type="text"
@@ -84,10 +78,10 @@
     
     import store from '../../store'
     import moment from 'moment'
-    import { getList } from '@/api/userManage'
     import { formatterColumn } from "@/utils";
-    import { mapGetters } from 'vuex'
-    import { getBalance, accountInfo, goPay } from '@/api/userManage'
+    import { mapGetters } from 'vuex';
+    import { getUser } from '@/utils/auth'
+    import { getBalance, accountInfo, goPay, getCompanyListName, getList } from '@/api/userManage'
 
     export default {
         data() {
@@ -96,12 +90,14 @@
                 total:0,
                 listLoading:false,
                 ruleForm: {
-                    companyName: "",
-                    companyType: "",
-                    source: "",
+                    ticketNo: "",
+                    polNo: "",
+                    applyStartTime: '',
+                    applyEndTime: '',
+                    companyName:'',
                     pageNum: 1,
                     pageSize: 10,
-                    legalPersonsAssets: "",
+                    source:''
                 },
                 rules: {
                 },
@@ -111,7 +107,9 @@
                     balance: '',
                     source:'',
                     productName:''
-                }
+                },
+                today:[],
+                options: []
             }
         },
         computed: {
@@ -120,10 +118,14 @@
             ])
         },
         created() {
-            // this.fetchData()
+            this.setDate()
+            this.fetchData()
+            this.getCompanyListName()
         },
         methods: {
             fetchData() {
+                this.ruleForm.applyStartTime = this.today[0]
+                this.ruleForm.applyEndTime = this.today[1]
                 this.listLoading = true
                 getList(this.ruleForm).then(response => {
                     this.tableData = response.data.list
@@ -133,6 +135,23 @@
                     this.$message.error(err);
                     this.listLoading = false
                 })
+            },
+            getCompanyListName(){
+                this.listLoading = true
+                getCompanyListName().then(response => {
+                    this.options = response.data
+                    this.listLoading = false
+                }).catch(err=>{
+                    this.$message.error(err);
+                    this.listLoading = false
+                })
+            },
+            setSource(v){
+                this.ruleForm.source = this.options.filter(item=>item.companyName==v)[0].source
+            },
+            setDate(){
+                var newday = moment(new Date()).format("YYYY-MM-DD")
+                this.today = [newday,newday]
             },
             handleSizeChange(val) {
                 this.ruleForm.pageSize = val
@@ -157,6 +176,7 @@
             resetForm(formName) {
                 this.$refs[formName].resetFields();
                 this.ruleForm.pageNum = 1
+                this.ruleForm.source = ''
                 this.fetchData()
             },
              //时间格式化

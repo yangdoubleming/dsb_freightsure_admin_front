@@ -31,7 +31,7 @@
                 </el-form-item>
             </el-form>
 		</el-col>
-
+        <el-col style="margin:15px auto;">总单量：1000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：1000</el-col>
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
             <el-table-column prop="loanTerm" label="豆沙包订单号" width="150"> </el-table-column>
@@ -51,7 +51,7 @@
                 </template>
             </el-table-column>
         </el-table>
-
+        
         <!-- 工具条 -->
         <div class="pageDown">
             <el-pagination

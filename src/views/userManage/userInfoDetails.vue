@@ -7,39 +7,39 @@
           <span>基本信息</span>
       </div>
       <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col :span="8"><div class=""><span class="bg-purple">用户账号：</span>{{details.contactPhone}}</div></el-col>
-        <el-col :span="8"><div class=""><span class="bg-purple">企业名称：</span>{{details.companyName}}</div></el-col>
-        <el-col :span="8"><div class=""><span class="bg-purple">企业类型：</span>{{details.companyType}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">订单号：</span>{{details.ticketNo}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">包主姓名：</span>{{details.name}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">产品名称：</span>{{details.productName}}</div></el-col>
       </el-row>
       <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col :span="8"><div class=""><span class="bg-purple">授权店铺：</span><label v-for="item in companyPlatformList" :key="item.id">{{item.paltformName}}；</label></div></el-col>
-        <el-col :span="8"><div class=""><span class="bg-purple">合作物流公司：</span>{{details.logisticsCompany}}</div></el-col>
-        <el-col :span="8"><div class=""><span class="bg-purple"> 合作支付公司：</span>{{details.paymentCompany}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">定价系数：</span>{{adjustPrice}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">产品id：</span>{{details.productId}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple"> 支付金额（元）：</span>{{details.productAmount||''}}</div></el-col>
       </el-row>
       <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col :span="8"><div class=""><span class="bg-purple">法人资产情况：</span>{{details.legalPersonsAssets}}</div></el-col>
-      </el-row>
-    </el-card>
-    <el-card class="box-card" shadow="hover" style="margin-top:30px;">
-      <div slot="header" class="clearfix">
-          <span>图片信息</span>
-      </div>
-      <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col :span="8"><div class=""><span class="bg-purple">营业执照：</span>{{details.productName}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">产品购买份数：</span>{{details.productNum}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">物流单号：</span>{{details.expressNo}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">物流发货日期：</span>{{dateFormat(details.expressTime)}}</div></el-col>
       </el-row>
       <el-row type="flex" class="row-bg" justify="space-between">
-          <el-image :src="tradingCertificate"></el-image>
+        <el-col :span="8"><div class=""><span class="bg-purple">购物网站订单号 ：</span>{{details.purchasOrderNo}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">购买日期：</span>{{dateFormat(details.shoppingTime)}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">起运地：</span>{{details.loadingPort}}</div></el-col>
       </el-row>
       <el-row type="flex" class="row-bg" justify="space-between">
-        <el-col :span="8"><div class=""><span class="bg-purple">身份证正反面：</span>{{details.productName}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">目的口岸：</span>{{details.destinationPort}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">运输方式：</span>{{details.expressChannel}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">商品价值明细：</span>{{details.goodsValueDetail}}</div></el-col>
       </el-row>
       <el-row type="flex" class="row-bg" justify="space-between">
-          <el-col :span="12">
-            <el-image :src="legalPersonIdFront"></el-image>
-          </el-col>
-          <el-col :span="12">
-            <el-image :src="legalPersonIdBack"></el-image>
-          </el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">商品价值：</span>{{details.goodsValue}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">商品种类：</span>{{details.goodsKind}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">商品列表：</span>{{details.goodsCategory}}</div></el-col>
+      </el-row>
+      <el-row type="flex" class="row-bg" justify="space-between">
+        <el-col :span="8"><div class=""><span class="bg-purple">生效日期：</span>{{dateFormat(details.effectiveDate)}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">截止日期：</span>{{dateFormat(details.endTime)}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">上传日期：</span>{{dateFormat(details.createAt)}}</div></el-col>
       </el-row>
     </el-card>
   </section>
@@ -53,7 +53,7 @@
     export default {
         data() {
             return {
-                loading: true,
+                loading: false,
                 details:{},
                 companyPlatformList:[],
                 legalPersonIdBack:'',
@@ -66,7 +66,6 @@
         },
         created() {
           this.fetchData();
-          
         },
         methods: {
           goBack() {
@@ -75,11 +74,7 @@
             fetchData(){
               getCusInsureDetails(this.$route.query).then(response => {
                   if(response.data){
-                    this.details = response.data.ciCompany
-                    this.tradingCertificate = `${BASE_URL}${response.data.ciCompany.tradingCertificate}`
-                    this.legalPersonIdBack = `${BASE_URL}${response.data.ciCompany.legalPersonIdBack}`
-                    this.legalPersonIdFront = `${BASE_URL}${response.data.ciCompany.legalPersonIdFront}`
-                    this.companyPlatformList = response.data.companyPlatformList
+                    this.details = response.data[0]
                   }
                   this.loading = false;
               }).catch(err=>{
