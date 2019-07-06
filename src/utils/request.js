@@ -16,7 +16,7 @@ import { getUser } from '@/utils/auth'
 const service = axios.create({
     withCredentials: true,
     baseURL: BASE_URL, // 测试环境
-    timeout: 10000 // 请求超时时间
+    timeout: 15000 // 请求超时时间
 })
 
 // request拦截器

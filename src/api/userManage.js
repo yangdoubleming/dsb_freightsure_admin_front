@@ -24,9 +24,9 @@ export function getCusInsureDetails(params) {
     })
 }
 
-export function findCiCompanyLoanList(data,type) {
+export function findCiCompanyLoanList(data) {
     return request({
-        url: `/findCiCompanyLoanList?ciCompanyId=${type}`,
+        url: `/apply/applyMerchantForBaosi   `,
         method: 'post',
         data: data
     })
@@ -34,11 +34,47 @@ export function findCiCompanyLoanList(data,type) {
 
 export function getCiCompanyLoanById(params) {
     return request({
-        url: '/getCiCompanyLoanById',
+        url: '/apply/applyClaim',
         method: 'get',
         params: params
     })
 }
+
+export function documentInfo(params) {
+    return request({
+        url: 'apply/documentInfo',
+        method: 'post',
+        data: params
+    })
+} 
+
+export function exportApplyDataToExcel(params) {
+    return request({
+        url: '/apply/exportApplyToExcelForBaosi',
+        method: 'get',
+        params: params,
+        responseType: 'arraybuffer'
+    })
+}
+
+export function exportOrderToExcelForBaosi(params) {
+    return request({
+        url: '/order/exportOrderToExcelForBaosi ',
+        method: 'get',
+        params: params,
+        responseType: 'arraybuffer'
+    })
+}
+
+export function ordersByBatchForBaosi(params) {
+    return request({
+        url: '/order/ordersByBatchForBaosi',
+        method: 'post',
+        data: params,
+    })
+}
+
+
 
 export function toExamineCompanyLoan(data) {
     return request({

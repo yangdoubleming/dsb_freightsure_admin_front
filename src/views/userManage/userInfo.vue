@@ -32,8 +32,8 @@
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
                     <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
-                    <!-- <el-button type="primary" @click="submitForm('ruleForm')">多单号查询</el-button> -->
-                    <el-button type="primary" @click="submitForm('ruleForm')">导出excel</el-button>
+                    <el-button type="primary" @click="centerDialogVisible = true">多单号查询</el-button>
+                    <el-button type="primary" @click="getExcel">导出excel</el-button>
                 </el-form-item>
             </el-form>
 		</el-col>
@@ -71,6 +71,32 @@
                 :total="total">
             </el-pagination>
         </div>
+        <el-dialog
+        title="多订单号查询"
+        :visible.sync="centerDialogVisible"
+        width="30%"
+        center>
+            <el-form :model="manyForm" ref="manyForm" label-width="125px" >
+                <el-form-item label="查询方式">
+                    <el-radio-group v-model="manyForm.type" size="medium">
+                    <el-radio border label='0'>豆沙包订单号</el-radio>
+                    <el-radio border label='1'>保司单号</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                <el-form-item>
+                    <el-input
+                    type="textarea"
+                    :rows="6"
+                    placeholder="输入要查询的单号，每行一个"
+                    v-model="manyForm.orderList">
+                    </el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitManyForm('manyForm')">查询</el-button>
+                    <el-button @click="centerDialogVisible = false">取消</el-button>
+                </el-form-item>
+            </el-form>
+        </el-dialog>
     </section>
 </template>
 
@@ -81,7 +107,7 @@
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex';
     import { getUser } from '@/utils/auth'
-    import { getBalance, accountInfo, goPay, getCompanyListName, getList } from '@/api/userManage'
+    import { getBalance, accountInfo, goPay, getCompanyListName, getList, exportOrderToExcelForBaosi, ordersByBatchForBaosi } from '@/api/userManage'
 
     export default {
         data() {
@@ -89,6 +115,8 @@
                 tableData: [],
                 total:0,
                 listLoading:false,
+                centerDialogVisible:false,
+                textarea:"",
                 ruleForm: {
                     ticketNo: "",
                     polNo: "",
@@ -98,6 +126,12 @@
                     pageNum: 1,
                     pageSize: 10,
                     source:''
+                },
+                manyForm:{
+                    type:'0',
+                    orderList:"",
+                    pageNum: 1,
+                    pageSize: 10,
                 },
                 rules: {
                 },
@@ -137,13 +171,10 @@
                 })
             },
             getCompanyListName(){
-                this.listLoading = true
                 getCompanyListName().then(response => {
                     this.options = response.data
-                    this.listLoading = false
                 }).catch(err=>{
                     this.$message.error(err);
-                    this.listLoading = false
                 })
             },
             setSource(v){
@@ -167,6 +198,25 @@
                     if (valid) {
                         this.ruleForm.pageNum = 1
                         this.fetchData()
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                });
+            },
+            submitManyForm(formName) {
+                console.log(this.manyForm)
+                this.$refs[formName].validate((valid) => {
+                    if (valid) {
+                        this.manyForm.pageNum = 1
+                        ordersByBatchForBaosi(this.manyForm).then(response => {
+                            this.tableData = response.data.list
+                            this.total = response.data.total
+                            this.listLoading = false
+                        }).catch(err=>{
+                            this.$message.error(err);
+                            this.listLoading = false
+                        })
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -212,7 +262,38 @@
                 }else if(row.companyType == 3){
                     return '进口/出口'
                 }
-            }
+            },
+            getExcel(){
+                this.ruleForm.applyStartTime = this.today[0]
+                this.ruleForm.applyEndTime = this.today[1]
+                this.listLoading = true
+                exportOrderToExcelForBaosi(this.ruleForm).then(response => {
+                    this.listLoading = false
+                }).catch(err=>{
+                    let blob = new Blob([err], {
+                      type: 'application/ms-txt;charset=utf-8'
+                    });// 转化为blob对象
+                    var day = moment(new Date()).format("YYYYMMDD")
+                    let filename = `订单列表${day}.csv`;// 判断是否使用默认文件名
+                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                      window.navigator.msSaveBlob(blob, filename);
+                    } else {
+                      var blobURL = window.URL.createObjectURL(blob);// 将blob对象转为一个URL
+                      var tempLink = document.createElement('a');// 创建一个a标签
+                      tempLink.style.display = 'none';
+                      tempLink.href = blobURL;
+                      tempLink.setAttribute('download', filename);// 给a标签添加下载属性
+                      if (typeof tempLink.download === 'undefined') {
+                        tempLink.setAttribute('target', '_blank');
+                      }
+                      document.body.appendChild(tempLink);// 将a标签添加到body当中
+                      tempLink.click();// 启动下载
+                      document.body.removeChild(tempLink);// 下载完毕删除a标签
+                      window.URL.revokeObjectURL(blobURL);
+                    }
+                    this.listLoading = false
+                })
+            },
             
         }
     }      

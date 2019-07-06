@@ -4,15 +4,15 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:50px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="豆沙包订单号" prop="source" v-if='!this.$route.query.ciCompanyId'>
-                    <el-input v-model="ruleForm.source" placeholder="请输入商户标识"></el-input>
+                <el-form-item label="豆沙包订单号" prop="ticketNo" v-if='!this.$route.query.ciCompanyId'>
+                    <el-input v-model="ruleForm.ticketNo" placeholder="请输入商户标识"></el-input>
                 </el-form-item>
-                <el-form-item label="保司单号" prop="source" v-if='!this.$route.query.ciCompanyId'>
-                    <el-input v-model="ruleForm.source" placeholder="请输入商户标识"></el-input>
+                <el-form-item label="保司单号" prop="polNo">
+                    <el-input v-model="ruleForm.polNo" placeholder="请输入商户标识"></el-input>
                 </el-form-item>
-                <el-form-item label="订单时间" prop="time">
+                <el-form-item label="生效时间" prop="applyTime">
                     <el-date-picker
-                        v-model="ruleForm.time"
+                        v-model="applyTime"
                         type="daterange"
                         range-separator="至"
                         value-format="yyyy-MM-dd"
@@ -20,26 +20,44 @@
                         end-placeholder="结束日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="商户名称" prop="source" v-if='!this.$route.query.ciCompanyId'>
-                    <el-input v-model="ruleForm.source" placeholder="请输入商户名称"></el-input>
+                <el-form-item label="处理理赔时间" prop="finTime">
+                    <el-date-picker
+                        v-model="finTime"
+                        type="daterange"
+                        range-separator="至"
+                        value-format="yyyy-MM-dd"
+                        start-placeholder="开始日期"
+                        end-placeholder="结束日期">
+                    </el-date-picker>
+                </el-form-item>
+                <el-form-item label="商户名称" prop="companyName" >
+                    <el-select v-model="ruleForm.companyName" filterable placeholder="请输入商户名称" @change="setSource">
+                        <el-option
+                        v-for="item in options"
+                        :key="item.source"
+                        :label="item.companyName"
+                        :value="item.companyName">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
                     <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
                     <el-button type="primary" @click="getExcel">导出excel</el-button>
-                    <!-- <el-button type="primary">批量结算审核</el-button> -->
                 </el-form-item>
             </el-form>
 		</el-col>
-        <el-col style="margin:15px auto;">总单量：1000 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：1000</el-col>
+        <el-col style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：{{tableData.length>0&&tableData[0].money1/100||0}}</el-col>
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
-            <el-table-column prop="loanTerm" label="豆沙包订单号" width="150"> </el-table-column>
-            <el-table-column prop="loanAmount" label="保司保单号" width="280"> </el-table-column>
-            <el-table-column prop="applyTime" label="商户名称" width=""></el-table-column>
-            <el-table-column prop="status" label="理赔金额（元）" width="" :formatter="statusText"> </el-table-column>
-            <el-table-column prop="contactName" label="订单时间" width=""> </el-table-column>
-            <el-table-column prop="policyNo" label="处理时间" width=""> </el-table-column>
+            <el-table-column prop="ticketNo" label="豆沙包订单号" width="150"> </el-table-column>
+            <el-table-column prop="polNo" label="保司保单号" width="280"> </el-table-column>
+            <el-table-column prop="companyName" label="商户名称" width=""></el-table-column>
+            <el-table-column prop="applyAmount" label="申请理赔金额（元）" width="" > </el-table-column>
+            <el-table-column prop="indemnifySum" label="理赔金额（元）" width=""> </el-table-column>
+            <el-table-column prop="effectiveDate" label="生效时间" width="" :formatter="dateFormat"> </el-table-column>
+            <el-table-column prop="updateAt" label="处理赔付时间" width="" :formatter="dateFormat"> </el-table-column>
+            <el-table-column prop="" label="理赔状态" width="" >已打款</el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="250">
                 <template slot-scope="scope">
                     <el-button
@@ -98,7 +116,7 @@
     
     import store from '../../store'
     import moment from 'moment'
-    import { findCiCompanyLoanList, getCiCompanyLoanById, toExamineCompanyLoan, downloadExcelForCompanyLoan, toBatchExamineCompanyLoan } from '@/api/userManage'
+    import { findCiCompanyLoanList,getCompanyListName, exportApplyDataToExcel, getCiCompanyLoanById, toExamineCompanyLoan, downloadExcelForCompanyLoan, toBatchExamineCompanyLoan } from '@/api/userManage'
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex'
     import { BASE_URL } from '@/utils/config'
@@ -111,14 +129,19 @@
                 total:0,
                 listLoading:false,
                 ruleForm: {
-                    ciCompanyId:'',
-                    loanTerm: "",
-                    status:'',
-                    settlement: "",
+                    ticketNo:'',
+                    polNo: "",
+                    dealStart:'',
+                    dealEnd: "",
+                    startTime:'',
+                    endTime:'',
+                    companyName:'',
                     source: '',
                     pageNum: 1,
                     pageSize: 10,
                 },
+                applyTime:[],
+                finTime:[],
                 rules: {
                 },
                 auditRuleForm:{
@@ -140,7 +163,8 @@
                     balance: '',
                     source:'',
                     productName:''
-                }
+                },
+                options: []
             }
         },
         computed: {
@@ -149,15 +173,20 @@
             ])
         },
         created() {
-            this.ruleForm.ciCompanyId = this.$route.query.ciCompanyId ||''
+            this.fetchData()
+            this.getCompanyListName()
         },
         methods: {
             goBack() {
                 this.$router.go(-1)
             },
             fetchData() {
+                this.ruleForm.startTime = this.applyTime[0]||''
+                this.ruleForm.endTime = this.applyTime[1]||''
+                this.ruleForm.dealStart = this.finTime[0]||''
+                this.ruleForm.dealEnd = this.finTime[1]||''
                 this.listLoading = true
-                findCiCompanyLoanList(this.ruleForm, this.$route.query.ciCompanyId||'').then(response => {
+                findCiCompanyLoanList(this.ruleForm).then(response => {
                     this.tableData = response.data.list
                     this.total = response.data.total
                     this.listLoading = false
@@ -165,6 +194,16 @@
                     this.$message.error(err);
                     this.listLoading = false
                 })
+            },
+            getCompanyListName(){
+                getCompanyListName().then(response => {
+                    this.options = response.data
+                }).catch(err=>{
+                    this.$message.error(err);
+                })
+            },
+            setSource(v){
+                this.ruleForm.source = this.options.filter(item=>item.companyName==v)[0].source
             },
             handleSizeChange(val) {
                 this.ruleForm.pageSize = val
@@ -200,7 +239,7 @@
                 return moment(date).format("YYYY-MM-DD HH:mm:ss")
             },
             loanDetails(row,type){
-                this.$router.push({path:`/userManage/${type}`,query: {id:row.id,productId:row.productId}})
+                this.$router.push({path:`/userManage/${type}`,query: {ticketNo:row.ticketNo,applyProductId:row.applyProductId,id:row.id}})
             },
             submitAuditForm(formName,settlement){
                 this.auditRuleForm.settlement = settlement
@@ -234,15 +273,37 @@
                 this.$router.push({path:`/userManage/repayRecords`,query: {ciCompanyId:row.ciCompanyId,loanNo:row.loanNo}})
             },
             getExcel(){
-                var form = {
-                    ciCompanyId:this.ruleForm.ciCompanyId,
-                    loanTerm: this.ruleForm.loanTerm,
-                    status:this.ruleForm.status,
-                    settlement: this.ruleForm.settlement,
-                    source: this.ruleForm.source,
-                } 
-                var params = this.urlEncode(form).slice(1)
-                window.location.href = `${BASE_URL}/downloadExcelForCompanyLoan?${params}`;
+                this.ruleForm.startTime = this.applyTime[0]||''
+                this.ruleForm.endTime = this.applyTime[1]||''
+                this.ruleForm.dealStart = this.finTime[0]||''
+                this.ruleForm.dealEnd = this.finTime[1]||''
+                this.listLoading = true
+                exportApplyDataToExcel(this.ruleForm).then(response => {
+                    this.listLoading = false
+                }).catch(err=>{
+                    let blob = new Blob([err], {
+                      type: 'application/ms-txt;charset=utf-8'
+                    });// 转化为blob对象
+                    var day = moment(new Date()).format("YYYYMMDD")
+                    let filename = `理赔列表${day}.csv`;// 判断是否使用默认文件名
+                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
+                      window.navigator.msSaveBlob(blob, filename);
+                    } else {
+                      var blobURL = window.URL.createObjectURL(blob);// 将blob对象转为一个URL
+                      var tempLink = document.createElement('a');// 创建一个a标签
+                      tempLink.style.display = 'none';
+                      tempLink.href = blobURL;
+                      tempLink.setAttribute('download', filename);// 给a标签添加下载属性
+                      if (typeof tempLink.download === 'undefined') {
+                        tempLink.setAttribute('target', '_blank');
+                      }
+                      document.body.appendChild(tempLink);// 将a标签添加到body当中
+                      tempLink.click();// 启动下载
+                      document.body.removeChild(tempLink);// 下载完毕删除a标签
+                      window.URL.revokeObjectURL(blobURL);
+                    }
+                    this.listLoading = false
+                })
             },
             statusText(row){
                 if(row.status == 0){
