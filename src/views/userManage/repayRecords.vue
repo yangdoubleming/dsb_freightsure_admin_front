@@ -195,7 +195,7 @@
                     this.total = result.data.total
                     this.listLoading = false
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                     this.listLoading = false
                 })
             },
@@ -257,7 +257,7 @@
                         this.centerDialogVisible = false
                         this.fetchData()
                     }).catch(err=>{
-                        this.$message.error(err);
+                        this.$message.error(err.msg);
                         this.centerDialogVisible = false
                     })
                 });

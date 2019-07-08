@@ -158,7 +158,7 @@
                     this.loading = false;
                 }).catch(err=>{
                     this.loading = false;
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                 })
             },
             submitForm(formName) {
@@ -172,7 +172,7 @@
                         editCompanyLoan(this.ruleForm).then(response => {
                             this.$message.success(response.msg);
                         }).catch(err=>{
-                            this.$message.error(err);
+                            this.$message.error(err.msg);
                         })
                     } else {
                         console.log('error submit!!');

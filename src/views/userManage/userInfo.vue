@@ -166,7 +166,7 @@
                     this.total = response.data.total
                     this.listLoading = false
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                     this.listLoading = false
                 })
             },
@@ -174,7 +174,7 @@
                 getCompanyListName().then(response => {
                     this.options = response.data
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                 })
             },
             setSource(v){
@@ -214,7 +214,7 @@
                             this.total = response.data.total
                             this.listLoading = false
                         }).catch(err=>{
-                            this.$message.error(err);
+                            this.$message.error(err.msg);
                             this.listLoading = false
                         })
                     } else {
@@ -224,6 +224,7 @@
                 });
             },
             resetForm(formName) {
+                this.setDate()
                 this.$refs[formName].resetFields();
                 this.ruleForm.pageNum = 1
                 this.ruleForm.source = ''

@@ -14,7 +14,7 @@
                 </span>
                 <el-input name="password" :type="pwdType" @keyup.enter.native="handleLogin" v-model="loginForm.password" autoComplete="on"
                 placeholder="密码"></el-input>
-                <span class="show-pwd iconfont icon-yanjing" @click="showPwd"></span>
+                <!-- <span class="show-pwd iconfont icon-yanjing" @click="showPwd"></span> -->
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" style="width:100%;" :loading="loading" @click.native.prevent="handleLogin">
@@ -85,8 +85,9 @@ export default {
                             this.loading = false;
                             this.$router.push({ path: "/" });
                         })
-                        .catch(() => {
+                        .catch((err) => {
                             this.loading = false;
+                            this.$message.error(err.msg);
                         });
                 } else {
                     console.log("error submit!!");

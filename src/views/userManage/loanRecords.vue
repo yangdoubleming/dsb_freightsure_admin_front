@@ -191,7 +191,7 @@
                     this.total = response.data.total
                     this.listLoading = false
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                     this.listLoading = false
                 })
             },
@@ -199,7 +199,7 @@
                 getCompanyListName().then(response => {
                     this.options = response.data
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                 })
             },
             setSource(v){
@@ -227,6 +227,13 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
+                this.ruleForm.source = ''
+                this.ruleForm.dealEnd = ''
+                this.ruleForm.dealStart = ''
+                this.ruleForm.endTime = ''
+                this.ruleForm.startTime = ''
+                this.applyTime = []
+                this.finTime = []
                 this.ruleForm.pageNum = 1
                 this.fetchData()
             },
@@ -250,7 +257,7 @@
                         this.ruleForm.pageNum = 1
                         this.fetchData()
                     }).catch(err=>{
-                        this.$message.error(err);
+                        this.$message.error(err.msg);
                         this.centerDialogVisible = false
                     })
                 });
@@ -266,7 +273,7 @@
                     this.auditRuleForm.id = row.id
                     this.centerDialogVisible = true
                 }).catch(err=>{
-                    this.$message.error(err);
+                    this.$message.error(err.msg);
                 })
             },
             repayRecords(row){
