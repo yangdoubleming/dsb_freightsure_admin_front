@@ -4,13 +4,13 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:50px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="豆沙包订单号" prop="ticketNo" v-if='!this.$route.query.ciCompanyId'>
-                    <el-input v-model="ruleForm.ticketNo" placeholder="请输入商户标识"></el-input>
+                <el-form-item label="手机号" prop="ticketNo" v-if='!this.$route.query.ciCompanyId'>
+                    <el-input v-model="ruleForm.ticketNo" placeholder="请输入手机号"></el-input>
                 </el-form-item>
-                <el-form-item label="保司单号" prop="polNo">
-                    <el-input v-model="ruleForm.polNo" placeholder="请输入商户标识"></el-input>
+                <el-form-item label="企业名称" prop="polNo">
+                    <el-input v-model="ruleForm.polNo" placeholder="请输入企业名称"></el-input>
                 </el-form-item>
-                <el-form-item label="生效时间" prop="applyTime">
+                <el-form-item label="驳回时间" prop="applyTime">
                     <el-date-picker
                         v-model="applyTime"
                         type="daterange"
@@ -30,16 +30,6 @@
                         end-placeholder="结束日期">
                     </el-date-picker>
                 </el-form-item>
-                <el-form-item label="商户名称" prop="companyName" >
-                    <el-select v-model="ruleForm.companyName" filterable placeholder="请输入商户名称" @change="setSource">
-                        <el-option
-                        v-for="item in options"
-                        :key="item.source"
-                        :label="item.companyName"
-                        :value="item.companyName">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
                     <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
@@ -50,14 +40,13 @@
         <el-col style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：{{tableData.length>0&&tableData[0].money1/100||0}}</el-col>
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
-            <el-table-column prop="ticketNo" label="豆沙包订单号" width="150"> </el-table-column>
-            <el-table-column prop="polNo" label="保司保单号" width="280"> </el-table-column>
-            <el-table-column prop="companyName" label="商户名称" width=""></el-table-column>
-            <el-table-column prop="applyAmount" label="申请理赔金额（元）" width="" > </el-table-column>
-            <el-table-column prop="indemnifySum" label="理赔金额（元）" width=""> </el-table-column>
-            <el-table-column prop="effectiveDate" label="生效时间" width="" :formatter="dateFormat"> </el-table-column>
-            <el-table-column prop="updateAt" label="处理赔付时间" width="" :formatter="dateFormat"> </el-table-column>
-            <el-table-column prop="" label="理赔状态" width="" >已打款</el-table-column>
+            <el-table-column prop="ticketNo" label="手机号" width="150"> </el-table-column>
+            <el-table-column prop="polNo" label="企业名称" width="280"> </el-table-column>
+            <el-table-column prop="companyName" label="姓名" width=""></el-table-column>
+            <el-table-column prop="applyAmount" label="线上销售额（万）" width="" > </el-table-column>
+            <el-table-column prop="indemnifySum" label="进口来源国" width=""> </el-table-column>
+            <el-table-column prop="effectiveDate" label="驳回时间" width="" :formatter="dateFormat"> </el-table-column>
+            <el-table-column prop="updateAt" label="操作人" width=""> </el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="250">
                 <template slot-scope="scope">
                     <el-button
@@ -201,9 +190,6 @@
                 }).catch(err=>{
                     this.$message.error(err.msg);
                 })
-            },
-            setSource(v){
-                this.ruleForm.source = this.options.filter(item=>item.companyName==v)[0].source
             },
             handleSizeChange(val) {
                 this.ruleForm.pageSize = val

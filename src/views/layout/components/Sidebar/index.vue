@@ -27,17 +27,27 @@ export default {
     ]),
     routes() {
       // return this.menus.data.menuList
-        return  [{
-			title: "信息管理",
-			list: [{
-				name: "订单列表",
-				url: "userInfo"
-			},{
-				name: "理赔列表",
-				url: "loanRecords"
-			}],
-			class: "userManage"
-        }]
+        return  [
+          {
+            title: "申请管理",
+            list: [{
+              name: "申请列表",
+              url: "userInfo"
+            },{
+              name: "驳回列表",
+              url: "loanRecords"
+            }],
+            class: "userManage"
+          },
+          {
+            title: "订单管理",
+            list: [{
+              name: "订单列表",
+              url: "orderList"
+            }],
+            class: "userManage"
+          },
+        ]
     },
     isCollapse() {
       return !this.sidebar.opened

@@ -24,7 +24,6 @@ router.beforeEach((to, from, next) => {
             if(to.path=='/'){
                 next('/login')
             }else{
-                Message.warning('请先登录')
                 next('/login')
             }
         }

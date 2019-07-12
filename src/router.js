@@ -29,37 +29,37 @@ export const constantRouterMap = [
                 path: 'userInfo',
                 name: 'userInfo',
                 component: () => import('@/views/userManage/userInfo'),
-                meta: { title: '用户信息'}
-            },
-            {
-                path: 'loanRecords',
-                name: 'loanRecords',
-                component: () => import('@/views/userManage/loanRecords'),
-                meta: { title: '贷款记录'}
-            },
-            {
-                path: 'repayRecords',
-                name: 'repayRecords',
-                component: () => import('@/views/userManage/repayRecords'),
-                meta: { title: '还款记录'}
+                meta: { title: '申请列表'}
             },
             {
                 path: 'userInfoDetails',
                 name: 'userInfoDetails',
                 component: () => import('@/views/userManage/userInfoDetails'),
-                meta: { title: '用户详情' }
+                meta: { title: '申请详情' }
+            },
+            {
+                path: 'loanRecords',
+                name: 'loanRecords',
+                component: () => import('@/views/userManage/loanRecords'),
+                meta: { title: '驳回列表'}
             },
             {
                 path: 'loanDetails',
                 name: 'loanDetails',
                 component: () => import('@/views/userManage/loanDetails'),
-                meta: { title: '贷款详情' }
+                meta: { title: '驳回详情' }
             },
             {
-                path: 'loanEdit',
-                name: 'loanEdit',
-                component: () => import('@/views/userManage/loanEdit'),
-                meta: { title: '贷款信息录入' }
+                path: 'orderList',
+                name: 'orderList',
+                component: () => import('@/views/userManage/orderList'),
+                meta: { title: '订单列表' }
+            },
+            {
+                path: 'orderDetails',
+                name: 'orderDetails',
+                component: () => import('@/views/userManage/loanDetails'),
+                meta: { title: '订单详情' }
             },
         ]
     },
