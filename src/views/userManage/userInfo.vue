@@ -68,7 +68,7 @@
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex';
     import { getUser } from '@/utils/auth'
-    import { getList, exportOrderToExcelForBaosi } from '@/api/userManage'
+    import { getList } from '@/api/userManage'
 
     export default {
         data() {
@@ -151,32 +151,6 @@
             },
             getExcel(){
                 this.listLoading = true
-                exportOrderToExcelForBaosi(this.ruleForm).then(response => {
-                    this.listLoading = false
-                }).catch(err=>{
-                    let blob = new Blob([err], {
-                      type: 'application/ms-txt;charset=utf-8'
-                    });// 转化为blob对象
-                    var day = moment(new Date()).format("YYYYMMDD")
-                    let filename = `订单列表${day}.csv`;// 判断是否使用默认文件名
-                    if (typeof window.navigator.msSaveBlob !== 'undefined') {
-                      window.navigator.msSaveBlob(blob, filename);
-                    } else {
-                      var blobURL = window.URL.createObjectURL(blob);// 将blob对象转为一个URL
-                      var tempLink = document.createElement('a');// 创建一个a标签
-                      tempLink.style.display = 'none';
-                      tempLink.href = blobURL;
-                      tempLink.setAttribute('download', filename);// 给a标签添加下载属性
-                      if (typeof tempLink.download === 'undefined') {
-                        tempLink.setAttribute('target', '_blank');
-                      }
-                      document.body.appendChild(tempLink);// 将a标签添加到body当中
-                      tempLink.click();// 启动下载
-                      document.body.removeChild(tempLink);// 下载完毕删除a标签
-                      window.URL.revokeObjectURL(blobURL);
-                    }
-                    this.listLoading = false
-                })
             },
             
         }

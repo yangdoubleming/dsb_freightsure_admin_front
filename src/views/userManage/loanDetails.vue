@@ -74,7 +74,7 @@
 
 <script>
     
-    import { getCiCompanyLoanById, documentInfo } from '@/api/userManage'
+    import { getTsCompanyAndPlatformById } from '@/api/userManage'
     import moment from 'moment'
 
     export default {
@@ -91,27 +91,19 @@
         },
         created() {
           this.fetchData();
-          this.documentInfo()
         },
         methods: {
           goBack() {
               this.$router.go(-1)
           },
           fetchData(){
-            getCiCompanyLoanById(this.$route.query).then(response => {
+            getTsCompanyAndPlatformById(this.$route.query).then(response => {
                 if(response.data.length>0){
                   this.details = response.data[0]
                 }
                 this.loading = false;
             }).catch(err=>{
                 this.loading = false;
-                this.$message.error(err.msg);
-            })
-          },
-          documentInfo(){
-            documentInfo({id:this.$route.query.id}).then(response => {
-                this.imgInfo = response.data
-            }).catch(err=>{
                 this.$message.error(err.msg);
             })
           },
