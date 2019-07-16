@@ -31,12 +31,12 @@
 
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="加载中" style="width: 100%">
-            <el-table-column prop="ticketNo" label="手机号" width="150"> </el-table-column>
             <el-table-column prop="polNo" label="企业名称" width="280"> </el-table-column>
-            <el-table-column prop="companyName" label="姓名"   width=""></el-table-column>
-            <el-table-column prop="" label="显示年销售额（万）" width=""></el-table-column>
-            <el-table-column prop="prodAmount" label="进口来源国"  width=""></el-table-column>
-            <el-table-column prop="effectiveDate" label="申请时间" :formatter="dateFormat" width=""> </el-table-column>
+            <el-table-column prop="polNo" label="保司保单号" width="280"> </el-table-column>
+            <el-table-column prop="companyName" label="销售人员"   width=""></el-table-column>
+            <el-table-column prop="" label="投保金额（元）" width=""></el-table-column>
+            <el-table-column prop="prodAmount" label="购买时间" :formatter="dateFormat" width=""></el-table-column>
+            <el-table-column prop="effectiveDate" label="备注" width=""> </el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="">
                 <template slot-scope="scope">
                     <el-button
@@ -44,6 +44,12 @@
                         type="text"
                         size="small">
                         详情
+                    </el-button>
+                    <el-button
+                        @click="userInfoDetails(scope.row)"
+                        type="text"
+                        size="small">
+                        商品清单
                     </el-button>
                 </template>
             </el-table-column>

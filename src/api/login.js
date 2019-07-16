@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function login(telephone, password) {
     return request({
-        url: '/user/login',
+        url: '/adminTs/user/login',
         method: 'post',
         data: {
             telephone,

@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getList(params) {
     return request({
-        url: '/order/ordersByBaosi',
+        url: '/adminTs/findTsCompanyInfoList',
         method: 'post',
         data: params
     })
@@ -16,11 +16,43 @@ export function getCompanyListName(params) {
     })
 }
 
-export function getCusInsureDetails(params) {
+export function getTsCompanyAndPlatformById(params) {
     return request({
-        url: '/merchant/merchantOrderList',
+        url: '/adminTs/getTsCompanyAndPlatformById',
         method: 'get',
         params: params
+    })
+}
+
+export function getAllProductCategoryForTrustsure(param) {
+    return request({
+        url: '/adminTs/getAllProductCategoryForTrustsure',
+        method: 'post',
+        data: param
+    })
+}
+
+export function editTsCompanyInfoAndOthers(param) {
+    return request({
+        url: '/adminTs/editTsCompanyInfoAndOthers',
+        method: 'post',
+        data: param
+    })
+}
+
+export function addTsApprovalRecord(param) {
+    return request({
+        url: '/adminTs/addTsApprovalRecord',
+        method: 'post',
+        data: param
+    })
+}
+
+export function findRejectRecordList(param) {
+    return request({
+        url: '/adminTs/findRejectRecordList',
+        method: 'post',
+        data: param
     })
 }
 

@@ -3,40 +3,37 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="手机号" prop="ticketNo">
-                    <el-input v-model="ruleForm.ticketNo" placeholder="请输入手机号"></el-input>
+                <el-form-item label="手机号" prop="contactPhone">
+                    <el-input v-model="ruleForm.contactPhone" placeholder="请输入手机号"></el-input>
                 </el-form-item>
-                <el-form-item label="企业名称" prop="polNo">
-                    <el-input v-model="ruleForm.polNo" placeholder="请输入企业名称"></el-input>
+                <el-form-item label="企业名称" prop="companyName">
+                    <el-input v-model="ruleForm.companyName" placeholder="请输入企业名称"></el-input>
                 </el-form-item>
-                <el-form-item label="申请时间" prop="time">
-                    <el-date-picker
-                        v-model="today"
-                        type="daterange"
-                        range-separator="至"
-                        value-format="yyyy-MM-dd"
-                        start-placeholder="开始日期"
-                        end-placeholder="结束日期">
-                    </el-date-picker>
+                <el-form-item label="申请时间">
+                    <el-col :span="11">
+                        <el-date-picker type="date" placeholder="选择开始日期" value-format="yyyy-MM-dd" v-model="ruleForm.startTime" style="width: 100%;"></el-date-picker>
+                    </el-col>
+                    <el-col class="line" :span="1">至</el-col>
+                    <el-col :span="11">
+                        <el-date-picker type="date" placeholder="选择结束日期" value-format="yyyy-MM-dd" v-model="ruleForm.endTime" style="width: 100%;"></el-date-picker>
+                    </el-col>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="resetForm('ruleForm')">重置</el-button>
                     <el-button type="primary" @click="submitForm('ruleForm')">查询</el-button>
-                    <el-button type="primary" @click="centerDialogVisible = true">多单号查询</el-button>
                     <el-button type="primary" @click="getExcel">导出excel</el-button>
                 </el-form-item>
             </el-form>
 		</el-col>
-        <el-col :span="6" :offset="18" style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总支付金额：{{tableData.length>0&&tableData[0].paymoney/100||0}}</el-col>
 
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="加载中" style="width: 100%">
-            <el-table-column prop="ticketNo" label="手机号" width="150"> </el-table-column>
-            <el-table-column prop="polNo" label="企业名称" width="280"> </el-table-column>
-            <el-table-column prop="companyName" label="姓名"   width=""></el-table-column>
-            <el-table-column prop="" label="显示年销售额（万）" width=""></el-table-column>
-            <el-table-column prop="prodAmount" label="进口来源国"  width=""></el-table-column>
-            <el-table-column prop="effectiveDate" label="申请时间" :formatter="dateFormat" width=""> </el-table-column>
+            <el-table-column prop="contactPhone" label="手机号" width="150"> </el-table-column>
+            <el-table-column prop="companyName" label="企业名称" width="280"> </el-table-column>
+            <el-table-column prop="contactName" label="姓名"   width=""></el-table-column>
+            <el-table-column prop="onlineAnnualSales" label="显示年销售额（万）" width=""></el-table-column>
+            <el-table-column prop="importRegions" label="进口来源国"  width=""></el-table-column>
+            <el-table-column prop="applicationTime" label="申请时间" :formatter="dateFormat" width=""> </el-table-column>
             <el-table-column prop="name" label="操作" fixed="right" width="">
                 <template slot-scope="scope">
                     <el-button
@@ -61,32 +58,6 @@
                 :total="total">
             </el-pagination>
         </div>
-        <el-dialog
-        title="多订单号查询"
-        :visible.sync="centerDialogVisible"
-        width="30%"
-        center>
-            <el-form :model="manyForm" ref="manyForm" label-width="125px" >
-                <el-form-item label="查询方式">
-                    <el-radio-group v-model="manyForm.type" size="medium">
-                    <el-radio border label='0'>豆沙包订单号</el-radio>
-                    <el-radio border label='1'>保司单号</el-radio>
-                    </el-radio-group>
-                </el-form-item>
-                <el-form-item>
-                    <el-input
-                    type="textarea"
-                    :rows="6"
-                    placeholder="输入要查询的单号，每行一个"
-                    v-model="manyForm.orderList">
-                    </el-input>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" @click="submitManyForm('manyForm')">查询</el-button>
-                    <el-button @click="centerDialogVisible = false">取消</el-button>
-                </el-form-item>
-            </el-form>
-        </el-dialog>
     </section>
 </template>
 
@@ -97,7 +68,7 @@
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex';
     import { getUser } from '@/utils/auth'
-    import { getBalance, accountInfo, goPay, getCompanyListName, getList, exportOrderToExcelForBaosi, ordersByBatchForBaosi } from '@/api/userManage'
+    import { getList, exportOrderToExcelForBaosi } from '@/api/userManage'
 
     export default {
         data() {
@@ -105,35 +76,16 @@
                 tableData: [],
                 total:0,
                 listLoading:false,
-                centerDialogVisible:false,
-                textarea:"",
                 ruleForm: {
-                    ticketNo: "",
-                    polNo: "",
-                    applyStartTime: '',
-                    applyEndTime: '',
-                    companyName:'',
-                    pageNum: 1,
-                    pageSize: 10,
-                    source:''
-                },
-                manyForm:{
-                    type:'0',
-                    orderList:"",
+                    contactPhone: "",
+                    companyName: "",
+                    startTime: '',
+                    endTime: '',
                     pageNum: 1,
                     pageSize: 10,
                 },
                 rules: {
                 },
-                payInfo: {
-                    ticketNo: '',
-                    discountAmount: '',
-                    balance: '',
-                    source:'',
-                    productName:''
-                },
-                today:[],
-                options: []
             }
         },
         computed: {
@@ -142,14 +94,10 @@
             ])
         },
         created() {
-            this.setDate()
             this.fetchData()
-            this.getCompanyListName()
         },
         methods: {
             fetchData() {
-                this.ruleForm.applyStartTime = this.today[0]
-                this.ruleForm.applyEndTime = this.today[1]
                 this.listLoading = true
                 getList(this.ruleForm).then(response => {
                     this.tableData = response.data.list
@@ -159,20 +107,6 @@
                     this.$message.error(err.msg);
                     this.listLoading = false
                 })
-            },
-            getCompanyListName(){
-                getCompanyListName().then(response => {
-                    this.options = response.data
-                }).catch(err=>{
-                    this.$message.error(err.msg);
-                })
-            },
-            setSource(v){
-                this.ruleForm.source = this.options.filter(item=>item.companyName==v)[0].source
-            },
-            setDate(){
-                var newday = moment(new Date()).format("YYYY-MM-DD")
-                this.today = ["2019-05-01","2019-06-01"]
             },
             handleSizeChange(val) {
                 this.ruleForm.pageSize = val
@@ -194,30 +128,11 @@
                     }
                 });
             },
-            submitManyForm(formName) {
-                console.log(this.manyForm)
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        this.manyForm.pageNum = 1
-                        ordersByBatchForBaosi(this.manyForm).then(response => {
-                            this.tableData = response.data.list
-                            this.total = response.data.total
-                            this.listLoading = false
-                        }).catch(err=>{
-                            this.$message.error(err.msg);
-                            this.listLoading = false
-                        })
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-            },
             resetForm(formName) {
-                this.setDate()
                 this.$refs[formName].resetFields();
+                this.ruleForm.startTime = ''
+                this.ruleForm.endTime = ''
                 this.ruleForm.pageNum = 1
-                this.ruleForm.source = ''
                 this.fetchData()
             },
              //时间格式化
@@ -234,29 +149,7 @@
             loanRecords(row){
                 this.$router.push({path:'/userManage/loanRecords',query:{ciCompanyId:row.id}})
             },
-            statusText(row){
-                if(row.legalPersonsAssets == 1){
-                    return '500万以内'
-                }else if(row.legalPersonsAssets == 2){
-                    return '500万-1000万'
-                }else if(row.legalPersonsAssets == 3){
-                    return '1000万-2000万'
-                }else if(row.legalPersonsAssets == 4){
-                    return '2000万以上'
-                }
-            },
-            comTypeText(row){
-                if(row.companyType == 1){
-                    return '进口'
-                }else if(row.companyType == 2){
-                    return '出口'
-                }else if(row.companyType == 3){
-                    return '进口/出口'
-                }
-            },
             getExcel(){
-                this.ruleForm.applyStartTime = this.today[0]
-                this.ruleForm.applyEndTime = this.today[1]
                 this.listLoading = true
                 exportOrderToExcelForBaosi(this.ruleForm).then(response => {
                     this.listLoading = false

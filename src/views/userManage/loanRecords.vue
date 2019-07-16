@@ -105,7 +105,7 @@
     
     import store from '../../store'
     import moment from 'moment'
-    import { findCiCompanyLoanList,getCompanyListName, exportApplyDataToExcel, getCiCompanyLoanById, toExamineCompanyLoan, downloadExcelForCompanyLoan, toBatchExamineCompanyLoan } from '@/api/userManage'
+    import { findRejectRecordList, findCiCompanyLoanList,getCompanyListName, exportApplyDataToExcel, getCiCompanyLoanById, toExamineCompanyLoan, downloadExcelForCompanyLoan, toBatchExamineCompanyLoan } from '@/api/userManage'
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex'
     import { BASE_URL } from '@/utils/config'
@@ -175,7 +175,7 @@
                 this.ruleForm.dealStart = this.finTime[0]||''
                 this.ruleForm.dealEnd = this.finTime[1]||''
                 this.listLoading = true
-                findCiCompanyLoanList(this.ruleForm).then(response => {
+                findRejectRecordList(this.ruleForm).then(response => {
                     this.tableData = response.data.list
                     this.total = response.data.total
                     this.listLoading = false
