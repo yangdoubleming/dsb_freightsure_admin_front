@@ -66,7 +66,7 @@
       </div>
       <el-row type="flex" class="row-bg" justify="space-between">
         <el-col :span="8"><div class=""><span class="bg-purple">销售人员：</span>{{details2.sellerName}}</div></el-col>
-        <el-col :span="8"><div class=""><span class="bg-purple">驳回时间：</span>{{details2.createTime}}</div></el-col>
+        <el-col :span="8"><div class=""><span class="bg-purple">驳回时间：</span>{{dateFormat(details2.createTime)}}</div></el-col>
         <el-col :span="8"><div class=""><span class="bg-purple">备注：</span>{{details2.remarks}}</div></el-col>
       </el-row>
     </el-card>

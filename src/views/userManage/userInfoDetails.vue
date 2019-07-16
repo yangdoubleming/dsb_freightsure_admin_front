@@ -57,6 +57,7 @@
               :with-credentials="true"
               :headers="myHeaders"
               :limit="1"
+              :on-error="handleErr"
               :on-exceed="handleExceed">
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
@@ -257,6 +258,7 @@
         centerDialogVisible: false,
         id:'',
         username:'',
+        uploadStatus:false,
         fileList1:[],
         fileListA:[],
         fileList2:[],
@@ -384,6 +386,10 @@
           this.ruleForm.companyPlatformList.splice(index, 1);
       },
       submitForm(formName) {
+        if(!this.uploadStatus){
+          this.$message.warning('请先上传产品清单')
+          return
+        }
         this.ruleForm.imagePathList = this.fileList1.concat(this.fileList2).concat(this.fileList3).concat(this.fileList4).concat(this.fileList5).concat(this.fileList6).concat(this.fileList7)||[]
         this.ruleForm.id = this.$route.query.id
         this.ruleForm.importRegionsList = this.ruleForm.importRegionsList.split('，')
@@ -414,6 +420,10 @@
       
       goBack() {
         this.$router.go(-1)
+      },
+      handleErr(){
+        this.uploadStatus = false
+        this.$message.error('上传产品清单失败')
       },
       handlePreview(file) {
         this.dialogImageUrl = file.url;
@@ -549,7 +559,13 @@
         this.$message.warning(`当前限制选择 1 个文件，本次选择了 ${files.length} 个文件，共选择了 ${files.length + fileList.length} 个文件`);
       },
       handleSuccess(response){
-        this.$message.success(response.msg)
+        if(response.code == 0){
+          this.uploadStatus = true
+          this.$message.success(response.msg)
+        }else{
+          this.uploadStatus = false
+          this.$message.error(response.msg)
+        }
       }
     }
   }      

@@ -4,7 +4,7 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:50px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="手机号" prop="contactPhone" v-if='!this.$route.query.ciCompanyId'>
+                <el-form-item label="手机号" prop="contactPhone">
                     <el-input v-model="ruleForm.contactPhone" placeholder="请输入手机号"></el-input>
                 </el-form-item>
                 <el-form-item label="企业名称" prop="companyName">

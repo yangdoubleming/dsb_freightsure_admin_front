@@ -4,22 +4,22 @@
         <!--查询栏-->
 		<el-col :span="24" class="toolbar" style="padding-bottom: 0px;margin-top:50px;">
 			<el-form :inline="true" :model="ruleForm" :rules="rules" ref="ruleForm" class="demo-form-inline">
-                <el-form-item label="销售人员" prop="contactPhone" v-if='!this.$route.query.ciCompanyId'>
-                    <el-input v-model="ruleForm.contactPhone" placeholder="请输入手机号"></el-input>
+                <el-form-item label="销售人员" prop="sellerName">
+                    <el-input v-model="ruleForm.sellerName" placeholder="请输入手机号"></el-input>
                 </el-form-item>
-                <el-form-item label="保司保单号" prop="companyName">
-                    <el-input v-model="ruleForm.companyName" placeholder="请输入企业名称"></el-input>
+                <el-form-item label="保司保单号" prop="baosiNo">
+                    <el-input v-model="ruleForm.baosiNo" placeholder="请输入企业名称"></el-input>
                 </el-form-item>
                 <el-form-item label="企业名称" prop="companyName">
                     <el-input v-model="ruleForm.companyName" placeholder="请输入企业名称"></el-input>
                 </el-form-item>
                 <el-form-item label="购买时间">
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择开始日期" value-format="yyyy-MM-dd" v-model="ruleForm.rejectStartTime" style="width: 100%;"></el-date-picker>
+                        <el-date-picker type="date" placeholder="选择开始日期" value-format="yyyy-MM-dd" v-model="ruleForm.buyStartTime" style="width: 100%;"></el-date-picker>
                     </el-col>
                     <el-col class="line" :span="1">至</el-col>
                     <el-col :span="11">
-                        <el-date-picker type="date" placeholder="选择结束日期" value-format="yyyy-MM-dd" v-model="ruleForm.rejectEndTime" style="width: 100%;"></el-date-picker>
+                        <el-date-picker type="date" placeholder="选择结束日期" value-format="yyyy-MM-dd" v-model="ruleForm.buyEndTime" style="width: 100%;"></el-date-picker>
                     </el-col>
                 </el-form-item>
                 <el-form-item>
@@ -134,8 +134,8 @@
             },
             resetForm(formName) {
                 this.$refs[formName].resetFields();
-                this.ruleForm.rejectStartTime = ''
-                this.ruleForm.rejectEndTime = ''
+                this.ruleForm.buyStartTime = ''
+                this.ruleForm.buyEndTime = ''
                 this.ruleForm.pageNum = 1
                 this.fetchData()
             },

@@ -120,7 +120,6 @@
     methods: {
       submitForm(formName) {
         this.ruleForm.tsCompanyId = this.id
-        console.log(this.ruleForm)
         this.$refs[formName].validate((valid) => {
           if (valid) {
               if(this.ruleForm.status==2){
@@ -133,11 +132,12 @@
               }
             this.loading = true
             addTsApprovalRecord(this.ruleForm).then(response => {
+                this.loading = false;
                 this.$message.success(response.msg);
-                this.loading = false;
+                this.$router.push({path:`/userManage/userInfo`})
             }).catch(err=>{
-                this.$message.error(err.msg);
                 this.loading = false;
+                this.$message.error(err.msg);
             })
           } else {
             return false;
