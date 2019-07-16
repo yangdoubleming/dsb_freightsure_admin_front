@@ -40,7 +40,7 @@
       </el-card>
       <el-card class="box-card" shadow="hover" style="margin-top:50px;">
         <div slot="header" class="clearfix">
-            <span>线下尽调回调</span>
+            <span>线下尽调回填</span>
         </div>
         <div class="demo-ruleForm">
           <el-form-item label="进货及销售流程：" prop="process">
