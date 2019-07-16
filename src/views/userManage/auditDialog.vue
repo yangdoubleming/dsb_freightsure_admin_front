@@ -7,7 +7,7 @@
             </el-radio-group>
         </el-form-item>
         <el-form-item label="销售人员" prop="sellerName">
-            <el-input v-model="ruleForm.sellerName"></el-input>
+            <el-input v-model="ruleForm.sellerName" disabled></el-input>
         </el-form-item>
         <el-form-item label="保司保单号" prop="baosiNo" v-if="ruleForm.status==1">
             <el-input v-model="ruleForm.baosiNo"></el-input>
@@ -53,7 +53,10 @@
   export default {
     props:{
         id:{
-            required: true
+          required: true
+        },
+        username:{
+          required: true
         }
     },
     data() {
@@ -110,6 +113,9 @@
         },
         loading:false,
       };
+    },
+    mounted(){
+      this.ruleForm.sellerName = this.username
     },
     methods: {
       submitForm(formName) {

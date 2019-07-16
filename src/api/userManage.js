@@ -56,9 +56,9 @@ export function findRejectRecordList(param) {
     })
 }
 
-export function exportApplyDataToExcel(params) {
+export function downloadExcelForCompanyInfo(params) {
     return request({
-        url: '/apply/exportApplyToExcelForBaosi',
+        url: '/adminTs/downloadExcelForCompanyInfo',
         method: 'get',
         params: params,
         responseType: 'arraybuffer'
@@ -73,3 +73,36 @@ export function findAdoptRecordList(params) {
     })
 }
 
+export function getTsApprovalRecordAndOthersById(params) {
+    return request({
+        url: '/adminTs/getTsApprovalRecordAndOthersById',
+        method: 'get',
+        params: params
+    })
+}
+
+export function findCompanyItemList(data,params) {
+    return request({
+        url: `/adminTs/findCompanyItemList?tsCompanyId=${params.tsCompanyId}&recordId=${params.id}`,
+        method: 'post',
+        data:data
+    })
+}
+
+export function downloadExcelForRejectRecord(params) {
+    return request({
+        url: '/adminTs/downloadExcelForRejectRecord',
+        method: 'get',
+        params: params,
+        responseType: 'arraybuffer'
+    })
+}
+
+export function downloadExcelForAdoptRecord(params) {
+    return request({
+        url: '/adminTs/downloadExcelForAdoptRecord',
+        method: 'get',
+        params: params,
+        responseType: 'arraybuffer'
+    })
+}

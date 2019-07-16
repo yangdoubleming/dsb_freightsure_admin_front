@@ -188,7 +188,7 @@
       :visible.sync="centerDialogVisible"
       width="80%"
       center>
-        <AuditDialog :id="id" />
+        <AuditDialog :id="id" :username="username" />
     </el-dialog>
   </section>
 </template>
@@ -256,6 +256,7 @@
         myHeaders: {token: getUser().token},
         centerDialogVisible: false,
         id:'',
+        username:'',
         fileList1:[],
         fileListA:[],
         fileList2:[],
@@ -282,6 +283,7 @@
         this.loading = true;
         getTsCompanyAndPlatformById(this.$route.query).then(response => {
             if(response.data.tsCompanyInfo){
+              this.username = response.data.user.name
               this.ruleForm.contactPhone = response.data.tsCompanyInfo.contactPhone||''
               this.ruleForm.companyName = response.data.tsCompanyInfo.companyName||''
               this.ruleForm.contactName = response.data.tsCompanyInfo.contactName||''
@@ -382,9 +384,14 @@
           this.ruleForm.companyPlatformList.splice(index, 1);
       },
       submitForm(formName) {
-        this.ruleForm.imagePathList = this.fileList1.concat(this.fileList2).concat(this.fileList3).concat(this.fileList4).concat(this.fileList5).concat(this.fileList6).concat(this.fileList7)
+        this.ruleForm.imagePathList = this.fileList1.concat(this.fileList2).concat(this.fileList3).concat(this.fileList4).concat(this.fileList5).concat(this.fileList6).concat(this.fileList7)||[]
         this.ruleForm.id = this.$route.query.id
         this.ruleForm.importRegionsList = this.ruleForm.importRegionsList.split('，')
+        var arr = []
+        this.ruleForm.imagePathList.forEach(item=>{
+          arr.push({type:item.type,imagePath:item.imagePath.replace(IMG_URL_show,"")})
+        })
+        this.ruleForm.imagePathList = arr
         this.$refs[formName].validate((valid) => {
           if (valid) {
             this.loading = true;

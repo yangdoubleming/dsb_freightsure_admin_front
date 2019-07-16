@@ -61,6 +61,12 @@ export const constantRouterMap = [
                 component: () => import('@/views/userManage/loanDetails'),
                 meta: { title: '订单详情' }
             },
+            {
+                path: 'goodsList',
+                name: 'goodsList',
+                component: () => import('@/views/userManage/goodsList'),
+                meta: { title: '商品清单' }
+            },
         ]
     },
 

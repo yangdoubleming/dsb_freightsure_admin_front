@@ -29,10 +29,9 @@
                 </el-form-item>
             </el-form>
 		</el-col>
-        <el-col style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：{{tableData.length>0&&tableData[0].money1/100||0}}</el-col>
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
-            <el-table-column prop="tsApprovalRecord.companyName" label="企业名称" width="280"> </el-table-column>
+            <el-table-column prop="tsCompanyInfo.companyName" label="企业名称" width="280"> </el-table-column>
             <el-table-column prop="baosiNo" label="保司保单号" width=""></el-table-column>
             <el-table-column prop="sellerName" label="销售人员" width="" > </el-table-column>
             <el-table-column prop="insureMoney" label="投保金额（元）" width=""> </el-table-column>
@@ -45,6 +44,12 @@
                         type="text"
                         size="small">
                         详情
+                    </el-button>
+                    <el-button
+                        @click="loanDetails(scope.row,'goodsList')"
+                        type="text"
+                        size="small">
+                        商品清单
                     </el-button>
                 </template>
             </el-table-column>
@@ -67,12 +72,8 @@
 
 <script>
     
-    import store from '../../store'
     import moment from 'moment'
-    import { findAdoptRecordList, exportApplyDataToExcel,} from '@/api/userManage'
-    import { formatterColumn } from "@/utils";
-    import { mapGetters } from 'vuex'
-    import { BASE_URL } from '@/utils/config'
+    import { findAdoptRecordList, downloadExcelForAdoptRecord,} from '@/api/userManage'
 
     export default {
         data() {
@@ -147,18 +148,18 @@
                 return moment(date).format("YYYY-MM-DD HH:mm:ss")
             },
             loanDetails(row,type){
-                this.$router.push({path:`/userManage/${type}`,query: {ticketNo:row.ticketNo,applyProductId:row.applyProductId,id:row.id}})
+                this.$router.push({path:`/userManage/${type}`,query: {tsCompanyId:row.tsCompanyId,type:'2',id:row.id}})
             },
             getExcel(){
                 this.listLoading = true
-                exportApplyDataToExcel(this.ruleForm).then(response => {
+                downloadExcelForAdoptRecord(this.ruleForm).then(response => {
                     this.listLoading = false
                 }).catch(err=>{
                     let blob = new Blob([err], {
                       type: 'application/ms-txt;charset=utf-8'
                     });// 转化为blob对象
                     var day = moment(new Date()).format("YYYYMMDD")
-                    let filename = `理赔列表${day}.csv`;// 判断是否使用默认文件名
+                    let filename = `订单列表${day}.csv`;// 判断是否使用默认文件名
                     if (typeof window.navigator.msSaveBlob !== 'undefined') {
                       window.navigator.msSaveBlob(blob, filename);
                     } else {

@@ -26,14 +26,13 @@
                 </el-form-item>
             </el-form>
 		</el-col>
-        <el-col style="margin:15px auto;">总单量：{{total||0}} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;总理赔金额：{{tableData.length>0&&tableData[0].money1/100||0}}</el-col>
         <!-- 表格 -->
         <el-table :data="tableData" v-loading="listLoading" element-loading-text="Loading" style="width: 100%">
-            <el-table-column prop="tsApprovalRecord.contactPhone" label="手机号" width="150"> </el-table-column>
-            <el-table-column prop="tsApprovalRecord.companyName" label="企业名称" width="280"> </el-table-column>
-            <el-table-column prop="tsApprovalRecord.contactName" label="姓名" width=""></el-table-column>
-            <el-table-column prop="tsApprovalRecord.onlineAnnualSales" label="线上销售额（万）" width="" > </el-table-column>
-            <el-table-column prop="tsApprovalRecord.importRegions" label="进口来源国" width=""> </el-table-column>
+            <el-table-column prop="tsCompanyInfo.contactPhone" label="手机号" width="150"> </el-table-column>
+            <el-table-column prop="tsCompanyInfo.companyName" label="企业名称" width="280"> </el-table-column>
+            <el-table-column prop="tsCompanyInfo.contactName" label="姓名" width=""></el-table-column>
+            <el-table-column prop="tsCompanyInfo.onlineAnnualSales" label="线上销售额（万）" width="" > </el-table-column>
+            <el-table-column prop="tsCompanyInfo.importRegions" label="进口来源国" width=""> </el-table-column>
             <el-table-column prop="createTime" label="驳回时间" width="" :formatter="dateFormat"> </el-table-column>
             <el-table-column prop="operator" label="操作人" width=""> </el-table-column>
             <el-table-column prop="remarks" label="备注" width=""> </el-table-column>
@@ -68,7 +67,7 @@
     
     import store from '../../store'
     import moment from 'moment'
-    import { findRejectRecordList, exportApplyDataToExcel,} from '@/api/userManage'
+    import { findRejectRecordList, downloadExcelForRejectRecord,} from '@/api/userManage'
     import { formatterColumn } from "@/utils";
     import { mapGetters } from 'vuex'
     import { BASE_URL } from '@/utils/config'
@@ -145,18 +144,18 @@
                 return moment(date).format("YYYY-MM-DD HH:mm:ss")
             },
             loanDetails(row,type){
-                this.$router.push({path:`/userManage/${type}`,query: {ticketNo:row.ticketNo,applyProductId:row.applyProductId,id:row.id}})
+                this.$router.push({path:`/userManage/${type}`,query: {type:'1',id:row.id}})
             },
             getExcel(){
                 this.listLoading = true
-                exportApplyDataToExcel(this.ruleForm).then(response => {
+                downloadExcelForRejectRecord(this.ruleForm).then(response => {
                     this.listLoading = false
                 }).catch(err=>{
                     let blob = new Blob([err], {
                       type: 'application/ms-txt;charset=utf-8'
                     });// 转化为blob对象
                     var day = moment(new Date()).format("YYYYMMDD")
-                    let filename = `理赔列表${day}.csv`;// 判断是否使用默认文件名
+                    let filename = `驳回列表${day}.csv`;// 判断是否使用默认文件名
                     if (typeof window.navigator.msSaveBlob !== 'undefined') {
                       window.navigator.msSaveBlob(blob, filename);
                     } else {
